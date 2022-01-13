@@ -167,9 +167,12 @@ class GLoss(nn.Module):
         with torch.no_grad():
             c_fuse = torch.cat((c_s[:, :80], c_t[:, 80:]), dim=1)
             _, _, _, q_fuse = self.face_model.compute_for_render(c_fuse)
+            q_fuse = q_fuse[:, :17]
 
         _, _, _, q_r = self.face_model.compute_for_render(c_r)
         _, _, _, q_low = self.face_model.compute_for_render(c_low)
+        q_r = q_r[:, :17]
+        q_low = q_low[:, :17]
         # endregion
 
         # region arcface
