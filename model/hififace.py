@@ -151,7 +151,7 @@ class UpSamplingBlock(nn.Module):
     def forward(self, x):
         x = self.net(x)
         m_r, i_r = x[:, 0, ...].unsqueeze(1), x[:, 1:, ...]
-        m_r = F.tanh(m_r)
+        m_r = torch.sigmoid(m_r)
         return i_r, m_r
 
 class SemanticFacialFusionModule(nn.Module):
@@ -166,7 +166,7 @@ class SemanticFacialFusionModule(nn.Module):
     def forward(self, target_image, z_enc, z_dec, id_vector):
         z_enc = self.sigma(z_enc)
         m_low = self.low_mask_predict(z_dec)
-        m_low = F.tanh(m_low)
+        m_low = torch.sigmoid(m_low)
 
         z_fuse = m_low * z_dec + (1 - m_low) * z_enc
 
