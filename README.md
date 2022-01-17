@@ -1,3 +1,6 @@
+### update
+> fix errors including (id loss, shape loss...)
+
 # HifiFace &mdash; Unofficial Pytorch Implementation
 >![](./assets/front_final.png)
 >
