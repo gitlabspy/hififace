@@ -89,13 +89,16 @@ class MultiScaleGANLoss(nn.Module):
 class SIDLoss(nn.Module):
     def __init__(self):
         super(SIDLoss, self).__init__()
-        self.l1 = nn.L1Loss()
 
     def forward(self, q_fuse, q_r, q_low, v_id_I_s, v_id_I_r, v_id_I_low):
-        shape_loss = self.l1(q_fuse, q_r) + self.l1(q_fuse, q_low)
-        inner_product_r = (torch.bmm(v_id_I_s.unsqueeze(1), v_id_I_r.unsqueeze(2)).squeeze())
-        inner_product_low = (torch.bmm(v_id_I_s.unsqueeze(1), v_id_I_low.unsqueeze(2)).squeeze())
-        id_loss = self.l1(torch.ones_like(inner_product_r), inner_product_r) + self.l1(torch.ones_like(inner_product_low), inner_product_low)
+        shape_loss = (
+            torch.mean(torch.abs(q_fuse - q_r), dim=[1, 2]).clamp(0.0, 10.0).mean()
+            + torch.mean(torch.abs(q_fuse - q_low), dim=[1, 2]).clamp(0.0, 10.0).mean()
+        )
+        id_loss = -(
+            F.cosine_similarity(v_id_I_s, v_id_I_r, 1)
+            + F.cosine_similarity(v_id_I_s, v_id_I_low, 1)
+        ).mean()
 
         sid_loss = 5 * id_loss + 0.5 * shape_loss
 
